@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import io.sebi.kwordle.game.Game
 import io.sebi.kwordle.game.LetterState
 import io.sebi.kwordle.game.LetterState.*
@@ -132,7 +132,7 @@ fun ColumnScope.Keyboard(g: Game, onKeyClicked: (Char) -> Unit) {
                                     .width(24.dp).height(32.dp)
                                     .background(state.color), contentAlignment = Alignment.Center
                             ) {
-                                Text("$letter", color = state.textColor, fontSize = 1.em)
+                                Text("$letter", color = state.textColor, fontSize = 15.sp)
                             }
                         }
                     }
@@ -189,7 +189,7 @@ fun WordleLetter(state: LetterState, letter: Char, index: Int) {
             Modifier.aspectRatio(1.0f).border(1.dp, White).fillMaxWidth().background(state.color),
             contentAlignment = Alignment.Center
         ) {
-            Text("$letter", color = state.textColor, fontSize = 3.em)
+            Text("$letter", color = state.textColor, fontSize = 40.sp)
         }
     }
 }

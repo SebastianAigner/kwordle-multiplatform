@@ -120,24 +120,41 @@ fun ColumnScope.Keyboard(g: Game, onKeyClicked: (Char) -> Unit) {
     val keyboard = listOf(
         "QWERTYUIOP", "ASDFGHJKL", "⏎ZXCVBNM⌫"
     )
-    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.border(1.dp, Color.Red).fillMaxWidth().height(IntrinsicSize.Max)
+    ) {
+        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             for (row in keyboard) {
-                Row(horizontalArrangement = Arrangement.Center) {
+                Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                    if(row.length == 9) {
+                        Spacer(Modifier.weight(0.5f))
+                    }
                     for (letter in row) {
-                        val state = g.bestGuessForLetter(letter)
-                        Crossfade(targetState = state) { state ->
-                            Box(
-                                Modifier.clickable { onKeyClicked(letter) }.padding(1.dp).border(1.dp, White)
-                                    .width(24.dp).height(32.dp)
-                                    .background(state.color), contentAlignment = Alignment.Center
-                            ) {
-                                Text("$letter", color = state.textColor, fontSize = 15.sp)
-                            }
+                        Box(Modifier.weight(1.0f, true)) {
+                            KeyboardKey(letter, g.bestGuessForLetter(letter), onKeyClicked)
                         }
+                    }
+                    if(row.length == 9) {
+                        Spacer(Modifier.weight(0.5f))
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun KeyboardKey(letter: Char, state: LetterState, onKeyClicked: (Char) -> Unit) {
+    Crossfade(targetState = state) { state ->
+        Box(
+            Modifier.clickable { onKeyClicked(letter) }.padding(1.dp)
+                .border(1.dp, White)
+                .aspectRatio(0.5f)
+                .fillMaxSize()
+                .background(state.color), contentAlignment = Alignment.Center
+        ) {
+            Text("$letter", color = state.textColor, fontSize = 15.sp)
         }
     }
 }

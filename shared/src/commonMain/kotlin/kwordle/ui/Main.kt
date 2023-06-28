@@ -124,9 +124,9 @@ fun ColumnScope.Keyboard(g: Game, onKeyClicked: (Char) -> Unit) {
         contentAlignment = Alignment.Center,
         modifier = Modifier.border(1.dp, Color.Red).fillMaxWidth().height(IntrinsicSize.Max)
     ) {
-        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, ) {
             for (row in keyboard) {
-                Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.weight(1.0f)) {
                     if(row.length == 9) {
                         Spacer(Modifier.weight(0.5f))
                     }

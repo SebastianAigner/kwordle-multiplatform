@@ -4,24 +4,55 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInHorizontally
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Shapes
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.White
-import androidx.compose.ui.input.key.*
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.sebi.kwordle.game.Game
 import io.sebi.kwordle.game.LetterState
-import io.sebi.kwordle.game.LetterState.*
+import io.sebi.kwordle.game.LetterState.CORRECT
+import io.sebi.kwordle.game.LetterState.INCORRECT
+import io.sebi.kwordle.game.LetterState.UNGUESSED
+import io.sebi.kwordle.game.LetterState.WRONG_POSITION
 import io.sebi.kwordle.game.WordleLetter
 import io.sebi.kwordle.game.WordleWord
 import kotlinx.coroutines.delay
@@ -41,13 +72,17 @@ fun WordleGame(game: Game) {
     Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
         Spacer(Modifier.height(10.dp))
         ColoredWords(gameState, scrollState)
-        WordInputWithOnScreenKeyboard(game, onWordSubmitted = {
-            game.guess(it)
-            scope.launch {
-                delay(100)
-                scrollState.animateScrollTo(scrollState.maxValue)
+        Box(Modifier.fillMaxSize().weight(1.0f)) {
+            Column(Modifier.fillMaxSize()) {
+                WordInputWithOnScreenKeyboard(game, onWordSubmitted = {
+                    game.guess(it)
+                    scope.launch {
+                        delay(100)
+                        scrollState.animateScrollTo(scrollState.maxValue)
+                    }
+                })
             }
-        })
+        }
     }
 }
 
@@ -96,7 +131,7 @@ fun ColumnScope.WordInputWithOnScreenKeyboard(game: Game, onWordSubmitted: (Stri
 
 @Composable
 fun ColumnScope.ColoredWords(gameState: List<WordleWord>, scrollState: ScrollState) {
-    Column(modifier = Modifier.fillMaxHeight().weight(1.0f).verticalScroll(scrollState)) {
+    Column(modifier = Modifier.fillMaxHeight().weight(1.5f).verticalScroll(scrollState)) {
         for (g in gameState) {
             ColoredWord(g)
         }
@@ -116,26 +151,28 @@ fun ColoredWord(w: WordleWord) {
 }
 
 @Composable
-fun ColumnScope.Keyboard(g: Game, onKeyClicked: (Char) -> Unit) {
+fun Keyboard(g: Game, onKeyClicked: (Char) -> Unit) {
     val keyboard = listOf(
         "QWERTYUIOP", "ASDFGHJKL", "⏎ZXCVBNM⌫"
     )
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier.border(1.dp, Color.Red).fillMaxWidth().height(IntrinsicSize.Max)
+        modifier = Modifier
+//            .border(1.dp, Color.Red)
+            .fillMaxWidth().fillMaxSize()
     ) {
-        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, ) {
+        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             for (row in keyboard) {
                 Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.weight(1.0f)) {
-                    if(row.length == 9) {
+                    if (row.length == 9) {
                         Spacer(Modifier.weight(0.5f))
                     }
                     for (letter in row) {
-                        Box(Modifier.weight(1.0f, true)) {
+                        Box(Modifier.fillMaxSize().weight(1.0f, true)) {
                             KeyboardKey(letter, g.bestGuessForLetter(letter), onKeyClicked)
                         }
                     }
-                    if(row.length == 9) {
+                    if (row.length == 9) {
                         Spacer(Modifier.weight(0.5f))
                     }
                 }
@@ -150,7 +187,6 @@ fun KeyboardKey(letter: Char, state: LetterState, onKeyClicked: (Char) -> Unit) 
         Box(
             Modifier.clickable { onKeyClicked(letter) }.padding(1.dp)
                 .border(1.dp, White)
-                .aspectRatio(0.5f)
                 .fillMaxSize()
                 .background(state.color), contentAlignment = Alignment.Center
         ) {

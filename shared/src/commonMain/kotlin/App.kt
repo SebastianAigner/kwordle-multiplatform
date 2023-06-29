@@ -20,7 +20,7 @@ val wordleGame = Game("CRANE")
 fun App() {
     MaterialTheme {
         Box(
-            Modifier.fillMaxSize().background(Color(0xFF121213)).padding(20.dp),
+            Modifier.fillMaxSize().background(Color(0xFF121213)).padding(10.dp),
             contentAlignment = Alignment.Center
         ) {
             Box(Modifier.widthIn(max = 560.dp).fillMaxSize()) {
